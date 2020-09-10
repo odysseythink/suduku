@@ -13,13 +13,12 @@ class CGridBtn : public QLabel
 public:
     CGridBtn(QWidget* parent = 0);
 	void paintEvent(QPaintEvent*);
-	void highlight(bool isHighlight); // finish
-	void setSameNumHighlight(bool isSameNumHighLight);
-	void setChosen(bool isChosen); // highlight + special icon
-	void setCorrect(bool isCorrect); // finish
-	void add(int num, bool editMode); // finish
-	void remove(int num, bool allRemove); // finish
-	void clearState(); // finish
+    void Set_Highlight(bool isHighlight); // finish
+    void Set_SameNumHighlight(bool isSameNumHighLight);
+    void Set_Correct(bool isCorrect); // finish
+    void Add_Num(int num, bool editMode); // finish
+    void Remove_Num(int num, bool allRemove); // finish
+    void Clear_State(); // finish
 	void setSelfIcon(const QPixmap& myicon);
 
 signals:
@@ -31,7 +30,6 @@ private:
 	QRect getPosi(int r); // finish
 
 private:
-	QPixmap m_chosenIcon;
 	QPixmap m_wrongIcon;
 	QPixmap m_selfIcon;
 	QString m_chosenColor;
@@ -39,10 +37,9 @@ private:
 	QString m_sameNumColor;
 	bool m_arr[9];
 	bool m_editMode;
-	bool m_highlight;
-	bool m_sameNumHighlight;
-	bool m_chosen;
-	bool m_correct;
+    bool m_bIsHighlight;
+    bool m_bIsSameNumHighlight;
+    bool m_bIsCorrect;
 	bool m_haveSelfIcon;
 };
 

@@ -33,43 +33,42 @@ public:
     ~CGameBoard();
 
 signals:
-	void setNumMsg(int rank, int num, bool isAdd, bool editMode);
+    void setNumMsg(uint32_t rank, uint32_t num, bool isAdd, bool editMode);
 	void check();
-	void clearGridMsg(int rank);
+    void clearGridMsg(uint32_t rank);
 	void requestHighlight(int rank);
 	void getAnswer();
 	void restartMsg();
 
 public slots: // connect with logic
-    void showProblem();
-	void highlightGrids(int rank, QVector<int> grids);
-	void showWrong(const QVector<int>& girds); // show which grids are misfilled
-	void showAnswer(const QVector< QVector<int> >& ans); // show answer of the problem
-	void setNum(int rank, int num, bool isAdd, bool editMode);
-	void clearGrid(int rank);
+    void showAnswer(const QVector< QVector<int> >& ans); // show answer of the problem
 
 private slots: // connect with GUI
-	void setBtnChosen(int rank); // show the btn chosen
-	void on_pushButton_clicked();
-	void updateTime();
-	void on_startpausebtn_clicked();
-    void On_RestartBtn_clicked();
-    void On_EditBtn_Click();
-    void On_EraseBtn_Click();
-    void On_CheckBtn_Click();
-	void sendOperation(int num = 0);    
-    void On_SudukuBtn_Clicked();
-    void On_InputNumBtn_Clicked();
+    void __On_Show_Problem();
+    void __On_Show_Wrong(const QVector<int>& girds); // show which grids are misfilled
+    void __On_SolveBtn_Clicked();
+    void __On_ConsumeTimer_Timeout();
+    void __On_StartpauseBtn_Clicked();
+    void __On_RestartBtn_clicked();
+    void __On_EditBtn_Click();
+    void __On_EraseBtn_Click();
+    void __On_CheckBtn_Click();
+    void __On_SudukuBtn_Clicked();
+    void __On_InputNumBtn_Clicked();
+    void __On_Highlight_Grids(int rank, QVector<int> grids);
+    void __On_SetNum(uint32_t rank, uint32_t num, bool isAdd, bool editMode);
+    void __On_ClearGrid(uint32_t rank);
 
 private:
-    void on_receive_operation(EN_Operation_Type op, int num);
-	void initTimer();
+    void __Receive_Operation(EN_Operation_Type op, uint32_t num);
+    void __Init_Timer();
+    void __Send_Operation(uint32_t num = 0);
 
 private:
     Ui::CGameBoard *ui;
-	int m_nChosenSudukuGridBtn; // 数独区被选中的按键
+    uint32_t m_nChosenSudukuGridBtn; // 数独区被选中的按键
     QTime m_StartTime;
-    std::shared_ptr<QTimer> m_iComsumetimer;
+    std::shared_ptr<QTimer> m_iConsumeTimer;
 	bool m_isStopped;
 	QIcon m_startIcon;
 	QIcon m_pauseIcon;

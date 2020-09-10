@@ -145,7 +145,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="m_iSolveBtn">
          <property name="minimumSize">
           <size>
            <width>75</width>
@@ -3002,7 +3002,7 @@
    <sender>m_iInputNum1Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>505</x>
@@ -3018,7 +3018,7 @@
    <sender>m_iInputNum2Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>575</x>
@@ -3034,7 +3034,7 @@
    <sender>m_iInputNum3Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>645</x>
@@ -3050,11 +3050,11 @@
    <sender>m_iInputNum4Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>560</x>
-     <y>212</y>
+     <x>549</x>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>686</x>
@@ -3066,7 +3066,7 @@
    <sender>m_iInputNum5Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>572</x>
@@ -3082,7 +3082,7 @@
    <sender>m_iInputNum6Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>642</x>
@@ -3098,7 +3098,7 @@
    <sender>m_iInputNum7Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>508</x>
@@ -3114,7 +3114,7 @@
    <sender>m_iInputNum8Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>582</x>
@@ -3130,7 +3130,7 @@
    <sender>m_iInputNum9Btn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_InputNumBtn_Clicked()</slot>
+   <slot>__On_InputNumBtn_Clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>654</x>
@@ -3146,7 +3146,7 @@
    <sender>m_iEditBtn</sender>
    <signal>click()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_EditBtn_Click()</slot>
+   <slot>__On_EditBtn_Click()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>582</x>
@@ -3162,7 +3162,7 @@
    <sender>m_iEraseBtn</sender>
    <signal>click()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_EraseBtn_Click()</slot>
+   <slot>__On_EraseBtn_Click()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>575</x>
@@ -3178,11 +3178,11 @@
    <sender>m_iCheckBtn</sender>
    <signal>click()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_CheckBtn_Click()</slot>
+   <slot>__On_CheckBtn_Click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>628</x>
-     <y>518</y>
+     <x>617</x>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
      <x>631</x>
@@ -3194,7 +3194,7 @@
    <sender>m_iRestartBtn</sender>
    <signal>clicked()</signal>
    <receiver>CGameBoard</receiver>
-   <slot>On_RestartBtn_clicked()</slot>
+   <slot>__On_RestartBtn_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>246</x>
@@ -3206,12 +3206,46 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>m_iSolveBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>CGameBoard</receiver>
+   <slot>__On_SolveBtn_Clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>30</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_iStartpauseBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>CGameBoard</receiver>
+   <slot>__On_StartpauseBtn_Clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>379</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>425</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>On_InputNumBtn_Clicked()</slot>
-  <slot>On_EditBtn_Click()</slot>
-  <slot>On_EraseBtn_Click()</slot>
-  <slot>On_CheckBtn_Click()</slot>
-  <slot>On_RestartBtn_clicked()</slot>
+  <slot>__On_InputNumBtn_Clicked()</slot>
+  <slot>__On_EditBtn_Click()</slot>
+  <slot>__On_EraseBtn_Click()</slot>
+  <slot>__On_CheckBtn_Click()</slot>
+  <slot>__On_RestartBtn_clicked()</slot>
+  <slot>__On_SolveBtn_Clicked()</slot>
+  <slot>__On_StartpauseBtn_Clicked()</slot>
  </slots>
 </ui>

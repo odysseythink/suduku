@@ -5,7 +5,7 @@
 #include <QDebug>
 
 CGridBtn::CGridBtn(QWidget* parent) : \
-	QLabel(parent), m_chosen(false), m_correct(true), m_editMode(false), m_highlight(false), m_sameNumHighlight(false), m_haveSelfIcon(false)
+    QLabel(parent), m_bIsCorrect(true), m_editMode(false), m_bIsHighlight(false), m_bIsSameNumHighlight(false), m_haveSelfIcon(false)
 {
     qDebug() << "CGridBtn constructor";
 	for(int i = 0; i < 9; ++i) {
@@ -19,16 +19,14 @@ CGridBtn::CGridBtn(QWidget* parent) : \
 	m_chosenColor = "background-color: #7bbfea";
 	m_normalColor = "background-color: #fff";
 	m_sameNumColor = "background-color: #ffff00";
-    m_chosenIcon = QPixmap(":/icon/resources/icons/circle.png");
-    m_wrongIcon = QPixmap(":/icon/resources/icons/cross.png");
 }
 
 void CGridBtn::paintEvent(QPaintEvent*)
 {
 	QPainter p(this);
 //	this->setFrameShape(QFrame::Box);
-	if(m_highlight) {
-		if(m_sameNumHighlight) {
+    if(m_bIsHighlight) {
+        if(m_bIsSameNumHighlight) {
 			setStyleSheet(m_sameNumColor);
 		} else {
 			setStyleSheet(m_chosenColor);
@@ -36,10 +34,7 @@ void CGridBtn::paintEvent(QPaintEvent*)
 	} else {
 		setStyleSheet(m_normalColor);
 	}
-	if(m_chosen) {
-		p.drawPixmap(0, 0, size().width(), size().height(), m_chosenIcon);
-	}
-	if(!m_correct) {
+    if(!m_bIsCorrect) {
 		p.drawPixmap(0, 0, size().width(), size().height(), m_wrongIcon);
 	}
 	if(m_haveSelfIcon) {
@@ -64,32 +59,26 @@ void CGridBtn::paintEvent(QPaintEvent*)
 	}
 }
 
-void CGridBtn::highlight(bool isHighlight)
+void CGridBtn::Set_Highlight(bool isHighlight)
 {
-	m_highlight = isHighlight;
+    m_bIsHighlight = isHighlight;
 	update();
 }
 
-void CGridBtn::setSameNumHighlight(bool isSameNumHighLight)
+void CGridBtn::Set_SameNumHighlight(bool isSameNumHighLight)
 {
-	m_highlight = true;
-	m_sameNumHighlight = isSameNumHighLight;
+    m_bIsHighlight = true;
+    m_bIsSameNumHighlight = isSameNumHighLight;
 	update();
 }
 
-void CGridBtn::setChosen(bool isChosen)
+void CGridBtn::Set_Correct(bool iscorrect)
 {
-	m_chosen = isChosen;
+    m_bIsCorrect = iscorrect;
 	update();
 }
 
-void CGridBtn::setCorrect(bool iscorrect)
-{
-	m_correct = iscorrect;
-	update();
-}
-
-void CGridBtn::add(int num, bool editMode)
+void CGridBtn::Add_Num(int num, bool editMode)
 {
 	if(!editMode) {
 		for(int i = 0; i < 9; ++i) {
@@ -102,7 +91,7 @@ void CGridBtn::add(int num, bool editMode)
 	update();
 }
 
-void CGridBtn::remove(int num, bool allRemove)
+void CGridBtn::Remove_Num(int num, bool allRemove)
 {
 	if(allRemove) {
 		for(int i = 0; i < 9; ++i) {
@@ -115,14 +104,13 @@ void CGridBtn::remove(int num, bool allRemove)
 }
 
 
-void CGridBtn::clearState()
+void CGridBtn::Clear_State()
 {
-//    qDebug() << "CGridBtn::clearState text=" << text();
+//    qDebug() << "CGridBtn::Clear_State text=" << text();
 	//m_editMode = false;
-	m_chosen = false;
-	m_correct = true;
-	m_highlight = false;
-	m_sameNumHighlight = false;
+    m_bIsCorrect = true;
+    m_bIsHighlight = false;
+    m_bIsSameNumHighlight = false;
 	update();
 }
 
@@ -143,8 +131,6 @@ void CGridBtn::mouseReleaseEvent(QMouseEvent* ev)
 	if(ev->x() < 0 || ev->x() > size().width() || ev->y() < 0 || ev->y() > size().height()) {
 		return;
 	}
-//    m_chosen = !m_chosen;
-//    update();
 	emit click();
 }
 

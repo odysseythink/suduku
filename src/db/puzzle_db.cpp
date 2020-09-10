@@ -90,6 +90,16 @@ std::shared_ptr<ST_PuzzleInfo_Type> Get_OnePuzzle_Unsolved(int level, QString& e
     return nullptr;      
 }
 
+bool Puzzle_Solved(uint64_t id, QString& error){
+    QSqlQuery q;
+    QString sql = QString("UPDATE tb_puzzle SET  solved=1 WHERE id=%1").arg(id);
+    qDebug() << "sql:" << sql;
+    if (!q.exec(sql)){
+        error = q.lastError().text();
+        return false;
+    }
+    return true;
+}
                                                                                 
 /**                                                                             
   * @}                                                                         

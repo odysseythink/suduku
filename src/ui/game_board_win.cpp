@@ -17,16 +17,15 @@ CGameBoard::CGameBoard(std::shared_ptr<ST_PuzzleInfo_Type> pInfo, QWidget *paren
 	m_startIcon = QIcon(":/icon/resources/icons/start.png");
 	m_pauseIcon = QIcon(":/icon/resources/icons/pause.png");
     ui->m_iStartpauseBtn->setIcon(m_pauseIcon);
-    m_iComsumetimer = std::make_shared<QTimer>(this);
-	initTimer();
-    connect(m_iComsumetimer.get(), SIGNAL(timeout()), this, SLOT(updateTime()));
-	//connect(ui->sudokugrid, SIGNAL(btnChosen(int)), this, SLOT(setBtnChosen(int)));
+    m_iConsumeTimer = std::make_shared<QTimer>(this);
+    __Init_Timer();
+    connect(m_iConsumeTimer.get(), SIGNAL(timeout()), this, SLOT(__On_ConsumeTimer_Timeout()));
 
-    for(int i = 1; i <= 9; i++) { // 大九宫格
-        for(int j = 1; j <= 9; j++) { // 子九宫格
-            CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((i-1)*9 + j));
+    for(int i = 0; i < 9; i++) { // 大九宫格
+        for(int j = 0; j < 9; j++) { // 子九宫格
+            CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(i*9 + j + 1));
             if(pBtn != nullptr){
-                connect(pBtn, SIGNAL(click()), this, SLOT(On_SudukuBtn_Clicked()));
+                connect(pBtn, SIGNAL(click()), this, SLOT(__On_SudukuBtn_Clicked()));
             }
         }
     }
@@ -36,21 +35,14 @@ CGameBoard::CGameBoard(std::shared_ptr<ST_PuzzleInfo_Type> pInfo, QWidget *paren
 	ui->m_iCheckBtn->setSelfIcon(QPixmap(":/icon/resources/icons/check.png"));
 
     m_iLogic = std::make_shared<LogicController>();
-    QObject::connect(m_iLogic.get(), SIGNAL(showProblem()), this, SLOT(showProblem()));
-    QObject::connect(this, SIGNAL(setNumMsg(int,int,bool,bool)), m_iLogic.get(), SLOT(setNum(int,int,bool,bool)));
-    QObject::connect(this, SIGNAL(check()), m_iLogic.get(), SLOT(check()));
-    QObject::connect(this, SIGNAL(clearGridMsg(int)), m_iLogic.get(), SLOT(clearGrid(int)));
-    QObject::connect(this, SIGNAL(requestHighlight(int)), m_iLogic.get(), SLOT(calHighlights(int)));
-    QObject::connect(this, SIGNAL(getAnswer()), m_iLogic.get(), SLOT(calAnswer()));
-    QObject::connect(this, SIGNAL(restartMsg()), m_iLogic.get(), SLOT(restartGame()));
+    connect(m_iLogic.get(), SIGNAL(showProblem()), this, SLOT(__On_Show_Problem()));
+    connect(m_iLogic.get(), SIGNAL(setNumMsg(uint32_t,uint32_t,bool,bool)), this, SLOT(__On_SetNum(uint32_t,uint32_t,bool,bool)));
+    connect(m_iLogic.get(), SIGNAL(showWrong(QVector<int>)), this, SLOT(__On_Show_Wrong(QVector<int>)));
+    connect(m_iLogic.get(), SIGNAL(clearGridMsg(uint32_t)), this, SLOT(__On_ClearGrid(uint32_t)));
+    connect(m_iLogic.get(), SIGNAL(highlightGrids(int,QVector<int>)), this, SLOT(__On_Highlight_Grids(int,QVector<int>)));
+    connect(m_iLogic.get(), SIGNAL(showAnswer(QVector<QVector<int> >)), this, SLOT(showAnswer(QVector<QVector<int> >)));
 
-    QObject::connect(m_iLogic.get(), SIGNAL(setNumMsg(int,int,bool,bool)), this, SLOT(setNum(int,int,bool,bool)));
-    QObject::connect(m_iLogic.get(), SIGNAL(showWrong(QVector<int>)), this, SLOT(showWrong(QVector<int>)));
-    QObject::connect(m_iLogic.get(), SIGNAL(clearGridMsg(int)), this, SLOT(clearGrid(int)));
-    QObject::connect(m_iLogic.get(), SIGNAL(highlightGrids(int,QVector<int>)), this, SLOT(highlightGrids(int,QVector<int>)));
-    QObject::connect(m_iLogic.get(), SIGNAL(showAnswer(QVector<QVector<int> >)), this, SLOT(showAnswer(QVector<QVector<int> >)));
-
-    if(!m_iLogic->startGame(pInfo)){
+    if(!m_iLogic->Start_Game(pInfo)){
         qDebug() << "start game failed";
         m_Exit = true;
     }
@@ -61,19 +53,19 @@ CGameBoard::~CGameBoard()
 	delete ui;
 }
 
-void CGameBoard::showProblem()
+void CGameBoard::__On_Show_Problem()
 {
     for(int iLoop = 0; iLoop < 9; iLoop++){
         for(int jLoop = 0; jLoop < 9; jLoop++){
             CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(iLoop*9 + jLoop + 1));
             if(pBtn != nullptr){
-                pBtn->clearState();
+                pBtn->Clear_State();
                 int value = m_iLogic->Get_MatData(iLoop, jLoop);
                 if(value != -1){
                     if(value) {
-                        pBtn->add(value, false);
+                        pBtn->Add_Num(value, false);
                     } else {
-                        pBtn->remove(0, true);
+                        pBtn->Remove_Num(0, true);
                     }
                 }
             }
@@ -81,54 +73,49 @@ void CGameBoard::showProblem()
     }
 }
 
-void CGameBoard::highlightGrids(int rank, QVector<int> grids)
+void CGameBoard::__On_Highlight_Grids(int rank, QVector<int> grids)
 {
-	int row = (rank-1)/9 + 1;
-	int col = (rank-1)%9 + 1;     
-	qDebug() << "gameboard::highlightGrids called";
-    qDebug() << "SukoduGrid highlightGrid slot called";
-    for(int i = 1; i <= 9; i++) {
-        for(int j = 1; j <= 9; j++) {
-            CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((i-1)*9 + j));
+    int row = (rank-1)/9;
+    int col = (rank-1)%9;
+    qDebug() << "__On_Highlight_Grids slot called";
+    for(int i = 0; i < 9; i++) {
+        for(int j = 0; j < 9; j++) {
+            CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(i*9 + j+1));
             if(pBtn != nullptr){
-                pBtn->clearState();
+                pBtn->Clear_State();
             }
         }
     }
-    for(int i = 1; i <= 9; i++) {
-        CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((i-1)*9 + col));
+    for(int i = 0; i < 9; i++) {
+        CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(i*9 + col + 1));
         if(pBtn != nullptr){
-            pBtn->highlight(true);
+            pBtn->Set_Highlight(true);
         }
-        pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((row-1)*9 + i));
+        pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(row*9 + i + 1));
         if(pBtn != nullptr){
-            pBtn->highlight(true);
+            pBtn->Set_Highlight(true);
         }
     }
     for(int r : grids) {
         CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(r));
         if(pBtn != nullptr){
-            pBtn->setSameNumHighlight(true);
+            pBtn->Set_SameNumHighlight(true);
         }
 
     }
     CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(rank));
     if(pBtn != nullptr){
-        pBtn->setSameNumHighlight(true);
-        pBtn->setChosen(true);
+        pBtn->Set_SameNumHighlight(true);
     }
-
-    qDebug() << "SukoduGrid highlightGrid slot finished";    
-	qDebug() << "gameboard::highlightGrids finished";
 }
 
-void CGameBoard::showWrong(const QVector<int>& grids)
+void CGameBoard::__On_Show_Wrong(const QVector<int>& grids)
 {     
     qDebug() << "SukoduGrid showWrongMsg slot called";
     for(int rank : grids) {
         CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(rank));
         if(pBtn != nullptr){
-            pBtn->setCorrect(false);
+            pBtn->Set_Correct(false);
         }
     }
     qDebug() << "SukoduGrid showWrongMsg slot finished";    
@@ -136,53 +123,59 @@ void CGameBoard::showWrong(const QVector<int>& grids)
 
 void CGameBoard::showAnswer(const QVector<QVector<int> >& ans)
 {
-    for(int i = 1; i <= 9; i++) {
-        for(int j = 1; j <= 9; j++) {
+    for(int i = 0; i < 9; i++) {
+        for(int j = 0; j < 9; j++) {
             if(ans[i][j]) {
-                CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((i-1)*9 + j));
+                CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(i*9 + j + 1));
                 if(pBtn != nullptr){
-                    pBtn->add(ans[i][j], false);
+                    pBtn->Add_Num(ans[i][j], false);
                 }
             }
         }
     }    
 }
 
-void CGameBoard::setNum(int rank, int num, bool isAdd, bool editMode)
+void CGameBoard::__On_SetNum(uint32_t rank, uint32_t num, bool isAdd, bool editMode)
 {
+    if(rank == 0 || rank > 81 || num == 0 || num > 9){
+        return;
+    }
 	m_nChosenSudukuGridBtn = rank;     
-    qDebug() << "SukoduGrid setNum slot called";
+    qDebug() << "SukoduGrid __On_SetNum slot called";
     CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(rank));
     if(pBtn != nullptr){
         if(isAdd) {
-            pBtn->add(num, editMode);
+            pBtn->Add_Num(num, editMode);
         } else {
-            pBtn->remove(num, false);
+            pBtn->Remove_Num(num, false);
         }
     }
 
-    qDebug() << "SukoduGrid setNum slot finished";    
+    qDebug() << "SukoduGrid __On_SetNum slot finished";
 }
 
-void CGameBoard::clearGrid(int rank)
+void CGameBoard::__On_ClearGrid(uint32_t rank)
 {
+    if(rank == 0 || rank > 81 ){
+        return;
+    }
     CGridBtn* pBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(rank));
     if(pBtn != nullptr){
-        pBtn->remove(0, true);
+        pBtn->Remove_Num(0, true);
     }
 }
 
-void CGameBoard::on_receive_operation(EN_Operation_Type op, int num)
+void CGameBoard::__Receive_Operation(EN_Operation_Type op, uint32_t num)
 {
+    if(num == 0 || num > 9) return;
 	if(m_isStopped) return;
 	qDebug() << "received operation" << "op = " << op << "number = " << num;
-	if(m_nChosenSudukuGridBtn == -1) return;
 	if (op == EN_Operation_CHECK) {
-		emit check();
+        m_iLogic->Check();
 		return;
 	}
 	else if (op == EN_Operation_REMOVE) {
-		emit clearGridMsg(m_nChosenSudukuGridBtn);
+        m_iLogic->Clear_Grid(m_nChosenSudukuGridBtn);
 		return;
 	}
 	bool isAdd = false;
@@ -196,25 +189,17 @@ void CGameBoard::on_receive_operation(EN_Operation_Type op, int num)
 	} else {
 		qDebug() << "something wrong in GameBoard::on_receive_operation";
 	}
-	emit setNumMsg(m_nChosenSudukuGridBtn, num, isAdd, editMode);
+    m_iLogic->Set_Num(m_nChosenSudukuGridBtn, num, isAdd, editMode);
 }
 
-void CGameBoard::setBtnChosen(int rank) // 数独区被选中的区域
-{
-    qDebug() << "chose btn" << rank;
-	if(m_isStopped) return;
-	m_nChosenSudukuGridBtn = rank;
-    m_iLogic->calHighlights(rank);
-}
-
-void CGameBoard::on_pushButton_clicked()
+void CGameBoard::__On_SolveBtn_Clicked()
 {
 	if(m_isStopped) return;
 	qDebug() << "requesting answer";
-	emit getAnswer();
+    m_iLogic->Calc_Answer();
 }
 
-void CGameBoard::updateTime()
+void CGameBoard::__On_ConsumeTimer_Timeout()
 {
     if(m_Exit){
         this->close();
@@ -226,74 +211,74 @@ void CGameBoard::updateTime()
 	// qDebug() << time.toString("hh:mm:ss");
 }
 
-void CGameBoard::on_startpausebtn_clicked()
+void CGameBoard::__On_StartpauseBtn_Clicked()
 {
 	if(m_isStopped) {
-        m_iComsumetimer->start(1000);
+        m_iConsumeTimer->start(1000);
 		m_isStopped = false;
         ui->m_iStartpauseBtn->setIcon(m_pauseIcon);
 	} else {
-        m_iComsumetimer->stop();
+        m_iConsumeTimer->stop();
 		m_isStopped = true;
         ui->m_iStartpauseBtn->setIcon(m_startIcon);
 	}
 }
 
-void CGameBoard::On_RestartBtn_clicked()
+void CGameBoard::__On_RestartBtn_clicked()
 {
-	initTimer();
-	emit restartMsg();
+    __Init_Timer();
+    m_iLogic->Restart_Game();
 }
 
-void CGameBoard::initTimer()
+void CGameBoard::__Init_Timer()
 {
     m_StartTime = QDateTime::currentDateTime().time();
     ui->timeLCD->display(QTime(0,0,0).toString("hh:mm:ss"));
-    if(!m_isStopped) m_iComsumetimer->start(50);
+    if(!m_isStopped) m_iConsumeTimer->start(50);
 }
 
-void CGameBoard::On_EditBtn_Click()
+void CGameBoard::__On_EditBtn_Click()
 {
 	if(m_enOperationMode != EN_Operation_EDITADD) {
 		m_enOperationMode = EN_Operation_EDITADD;
-		ui->m_iEditBtn->highlight(true);
+        ui->m_iEditBtn->Set_Highlight(true);
 	} else {
 		m_enOperationMode = EN_Operation_INPUTADD;
-		ui->m_iEditBtn->highlight(false);
+        ui->m_iEditBtn->Set_Highlight(false);
 	}
 }
 
-void CGameBoard::On_EraseBtn_Click()
+void CGameBoard::__On_EraseBtn_Click()
 {
-	on_receive_operation(EN_Operation_REMOVE, 0);
+    __Receive_Operation(EN_Operation_REMOVE, 0);
 }
 
-void CGameBoard::On_CheckBtn_Click()
+void CGameBoard::__On_CheckBtn_Click()
 {
-	on_receive_operation(EN_Operation_CHECK, 0);
+    __Receive_Operation(EN_Operation_CHECK, 0);
 }
 
-void CGameBoard::sendOperation(int num)
+void CGameBoard::__Send_Operation(uint32_t num)
 {
+    if(num == 0 || num > 9) return;
 	//qDebug() << mode << num;
-    on_receive_operation(m_enOperationMode, num);
+    __Receive_Operation(m_enOperationMode, num);
 }
 
-void CGameBoard::On_SudukuBtn_Clicked()
+void CGameBoard::__On_SudukuBtn_Clicked()
 {
     CGridBtn* pBtn = qobject_cast<CGridBtn*>(sender());
     if(pBtn != nullptr){
-        for(int i = 1; i <= 9; i++) { // 大九宫格
-            for(int j = 1; j <= 9; j++) { // 子九宫格
-                CGridBtn* pUiBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number((i-1)*9 + j));
+        for(int i = 0; i < 9; i++) { // 大九宫格
+            for(int j = 0; j < 9; j++) { // 子九宫格
+                CGridBtn* pUiBtn = findChild<CGridBtn*>("m_iSudukuBtn" + QString::number(i*9 + j + 1));
                 if(pUiBtn != nullptr){
                     if(pUiBtn == pBtn){
-//                        setBtnChosen((i-1)*9 + j);
-                        int rank = (i-1)*9 + j;
+                        int rank = i*9 + j + 1;
                         qDebug() << "chose btn" << rank;
                         if(m_isStopped) return;
                         m_nChosenSudukuGridBtn = rank;
-                        m_iLogic->calHighlights(rank);
+                        m_iLogic->Calc_Highlights(rank);
                         return;
                     }
                 }
@@ -303,16 +288,16 @@ void CGameBoard::On_SudukuBtn_Clicked()
     qDebug() << "can't find sender";
 }
 
-void CGameBoard::On_InputNumBtn_Clicked()
+void CGameBoard::__On_InputNumBtn_Clicked()
 {
     QPushButton* pBtn = qobject_cast<QPushButton*>(sender());
     if(pBtn == nullptr){
         qDebug() << "invalid sender";
     }
-    for(int i = 1; i <= 9; i++) {
-        QPushButton* pNumBtn = findChild<QPushButton*>(QString("m_iInputNum%1Btn").arg(QString::number(i)));
+    for(uint32_t i = 1; i <= 9; i++) {
+        QPushButton* pNumBtn = findChild<QPushButton*>(QString::asprintf("m_iInputNum%dBtn", i));
         if(pNumBtn != nullptr && pNumBtn == pBtn){
-            sendOperation(i);
+            __Send_Operation(i);
             return;
         }
     }

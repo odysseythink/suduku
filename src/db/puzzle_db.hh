@@ -63,7 +63,7 @@ typedef struct{
 /*============================================================================*/
 bool Add_Puzzle(QString content, int level, QString& error);
 std::shared_ptr<ST_PuzzleInfo_Type> Get_OnePuzzle_Unsolved(int level, QString& error);
-
+bool Puzzle_Solved(uint64_t id, QString& error);
 
 
 
